@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Winner Management</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 50px; background: #05070a; color: #fff; }
+        .box { background: #111; padding: 30px; border-radius: 15px; max-width: 600px; margin: auto; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* Navigation Bar */
+        .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .logout-link { color: #888; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .logout-link:hover { color: #e74c3c; }
+
+        h2 { color: #d4af37; margin-top: 0; }
+        input { padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: white; width: 60%; }
+        button { padding: 12px 20px; border-radius: 8px; border: none; background: #d4af37; color: black; font-weight: bold; cursor: pointer; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        th { text-align: left; color: #888; border-bottom: 2px solid #333; padding: 10px; }
+        td { border-bottom: 1px solid #222; padding: 12px 10px; }
+        
+        .btn-del { color: #e74c3c; text-decoration: none; font-size: 0.85rem; }
+        .btn-del:hover { text-decoration: underline; }
+        
+        .flash { padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; }
+        .success { background: rgba(46, 204, 113, 0.1); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.2); }
+        .error, .warning { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.2); }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="nav">
+            <span>Admin Portal</span>
+            <a href="/logout" class="logout-link">Logout</a>
+        </div>
+
+        <h2>Manage Winners</h2>
+        
+        <form method="POST">
+            <input type="text" name="team_id" placeholder="Enter Team ID" required>
+            <button type="submit" name="add_id">Add Winner</button>
+        </form>
+
+        <div style="margin-top: 15px;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Team ID</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for winner in winners %}
+                <tr>
+                    <td>{{ winner.team_id }}</td>
+                    <td style="text-align: right;">
+                        <a href="/admin?delete={{ winner.team_id }}" 
+                           class="btn-del" 
+                           onclick="return confirm('Are you sure you want to remove Team {{ winner.team_id }}?')">
+                           Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <br><br>
+        <a href="/" style="color: #d4af37; text-decoration: none; font-size: 0.9rem;">&larr; Public View</a>
+    </div>
+</body>
+</html>
