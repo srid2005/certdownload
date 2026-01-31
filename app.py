@@ -3,6 +3,10 @@ from PIL import Image, ImageDraw, ImageFont
 import pandas as pd
 import os
 
+import datetime
+timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
 app = Flask(__name__)
 app.secret_key = "luxury_hackathon_secret_2026" 
 ADMIN_USERNAME = "admin"
@@ -34,15 +38,7 @@ def generate_certificate(name, template_path, output_dir):
     img.save(file_path, "PDF")
     return file_path
 
-def delete_file(file_path):
-    """Deletes the file at the given path after a delay."""
-    time.sleep(120) # Wait for 2 minutes (120 seconds)
-    try:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            print(f"Temporary file deleted: {file_path}")
-    except Exception as e:
-        print(f"Error deleting file: {e}")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -121,6 +117,8 @@ def index():
         if match.empty:
             return render_template("index.html", error="Record not found. Ensure Name and Team ID are correct.")
 
+
+
         # Get the official name from CSV (for correct capitalization)
         official_name = match.iloc[0]["member_name"].title()
 
@@ -130,7 +128,10 @@ def index():
 
         # Generate and send
         try:
+            log_entry = f"{timestamp},{team_id},{official_name},Downloaded\n"
             pdf_path = generate_certificate(official_name, template, OUTPUT_FOLDER)
+            with open(os.path.join(BASE_DIR, "downloads.log"), "a") as log_file:
+                log_file.write(log_entry)
             return send_file(pdf_path, as_attachment=True)
         except Exception as e:
             return render_template("index.html", error=f"Generation Error: {str(e)}")
